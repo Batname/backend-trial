@@ -2,5 +2,5 @@
 
 module.exports = {
   root: process.cwd(),
-  port: 3002
+  port: 3003
 };

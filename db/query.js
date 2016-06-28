@@ -3,7 +3,20 @@
 const fs = require('fs');
 const path = require('path');
 
-exports.each = (db, options) => {
+exports.get = (db, queryString) => {
+  return new Promise((resolve, reject) => {
+
+    function callback (err, rows){
+      if (err) reject(err);
+      resolve(rows);
+    }
+
+    db.get(queryString, callback);
+
+  });
+};
+
+exports.each = (db, queryString) => {
   return new Promise((resolve, reject) => {
 
     let rows = [];
@@ -17,16 +30,7 @@ exports.each = (db, options) => {
       rows.push(row);
     }
 
-    if (options.file) {
-      fs.readFile(path.join(__dirname, 'fixture', options.file), (error, data) => {
-        error && reject(error);
-        db.each(data.toString(), eachCb, complete);
-      });
-    } else if (options.string) {
-      db.each(options.string, eachCb, complete);
-    } else {
-      reject('you should specify file or sql string');
-    }
+    db.each(queryString, eachCb, complete);
 
   });
 };

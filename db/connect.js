@@ -1,9 +1,9 @@
 'use strict';
 
-const mysql = require('mysql');
+const sqlite3 = require('sqlite3').verbose();
 const config = require('config');
-const connection = mysql.createConnection(config.dbConfig);
- 
-connection.connect();
+const path = require('path');
 
-module.exports = connection;
+
+const db = new sqlite3.Database(path.join(config.root, 'db', 'deskbookers.db'));
+module.exports = db;

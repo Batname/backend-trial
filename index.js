@@ -6,13 +6,16 @@ const config = require('config');
 const path = require('path');
 const fs = require('fs');
 const middlewares = fs.readdirSync(path.join(__dirname, 'middlewares')).sort();
-const db = require('./db/connect');
+const co = require('co');
+const connect = require('./db/connect');
+const query = require('./db/query');
 
-db.serialize(function() {
-  db.each('SELECT * FROM users', function(err, row) {
-    console.log(arguments)
-  });
-});
+co(function* () {
+  let db = yield connect();
+  let rows = yield query.each(db, {string: 'SELECT * FROM users'});
+  db.close();
+  console.log(rows);
+}).catch(err => console.log(err.message))
 
 
 middlewares.forEach(middleware => app.use(require('./middlewares/' + middleware)));

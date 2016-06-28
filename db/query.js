@@ -3,25 +3,27 @@
 const fs = require('fs');
 const path = require('path');
 
-module.exports = (connection, options) => {
+exports.each = (db, options) => {
   return new Promise((resolve, reject) => {
 
-    function runQuery(queryString) {
-      connection.query(queryString, (err, rows) => {
-        if (err) reject(err);
-        
-        resolve(rows);
-      });
+    let rows = [];
 
+    function complete () {
+      resolve(rows);
+    }
+
+    function eachCb (err, row){
+      if (err) reject(err);
+      rows.push(row);
     }
 
     if (options.file) {
       fs.readFile(path.join(__dirname, 'fixture', options.file), (error, data) => {
         error && reject(error);
-        runQuery(data.toString());
+        db.each(data.toString(), eachCb, complete);
       });
     } else if (options.string) {
-      runQuery(options.string);
+      db.each(options.string, eachCb, complete);
     } else {
       reject('you should specify file or sql string');
     }

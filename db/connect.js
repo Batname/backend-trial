@@ -5,5 +5,12 @@ const config = require('config');
 const path = require('path');
 
 
-const db = new sqlite3.Database(path.join(config.root, 'db', 'deskbookers.db'));
-module.exports = db;
+
+module.exports = () => {
+  return new Promise((resolve, reject) => {
+    const db = new sqlite3.Database(path.join(config.root, 'db', 'deskbookers.db'), errCalback);
+
+    function errCalback (err) { err && reject(err); }
+    db.on('open', () => resolve(db));
+  });
+}

@@ -8,3 +8,8 @@
 
 ### before run
 + `$ ./scripts/installdb.sh`
+
+
+### run
++ `$ npm start`
++ Go to url http://localhost:3003/

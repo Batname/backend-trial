@@ -1,11 +1,46 @@
 doctype html
 html
+  head
+    title Assignment 1: Create a Report (SQL)
+    meta(http-equiv='content-type', content='text/html; charset=utf-8')
+    style(type='text/css').
+      .report-table {
+        width: 100%;
+        border: 1px solid #000000;
+      }
+      .report-table td, .report-table th {
+        text-align: left;
+        border: 1px solid #000000;
+        padding: 5px;
+      }
+      .report-table .right {
+        text-align: right;
+      }
   body
-
-    ul
-      li
-        a(href="/static.html") static
-      li
-        a(href="/views") views count
-
-    div=user
+    div.links
+      each m in months
+        div
+          a(href='/report/' + m) Generate report fo #{m + 1} months
+    h1 Report:
+    table.report-table
+      thead
+        tr
+          th Start
+          th Bookers
+          th # of bookings (avg)
+          th Turnover (avg)
+          th LTV
+      tbody
+        each month in monthsReport
+          tr
+            td=month.month
+            td=month.bookers
+            td=month.bookings
+            td=month.turnover
+            td=month.tlv
+      tfoot
+        tr
+          td.right(colspan='4')
+            strong Total rows: 
+              span=monthsReport.length
+          td

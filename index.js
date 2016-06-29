@@ -1,19 +1,19 @@
 'use strict';
 
 const koa = require('koa');
-const app = koa();
 const config = require('config');
 const path = require('path');
 const fs = require('fs');
-const middlewares = fs.readdirSync(path.join(__dirname, 'middlewares')).sort();
 const co = require('co');
 const moment = require('moment');
 const Router = require('koa-router');
-const router = new Router();
 
 const connect = require('./db/connect');
 const query = require('./db/query');
 
+const app = koa();
+const router = new Router();
+const middlewares = fs.readdirSync(path.join(__dirname, 'middlewares')).sort();
 
 function getByMonthLimit(offset) {
   let bookers = 0, curentBooker = 0, sum = 0;
@@ -57,17 +57,26 @@ function getByMonthLimit(offset) {
 }
 
 router
-  .get('/api/report/:offset', function* () {
-    const offset = parseInt(this.params.offset, 10);
+  .get('/report/:month', function* () {
+    let monthsReport = [];
+    const month = parseInt(this.params.month, 10);
+    const allow = [2,8,17];
 
-    if (offset === NaN) this.throw(404);
+    if (month === NaN) this.throw(404);
+    if (!allow.includes(month)) this.throw(422, 'wrong period');
 
-    this.body = yield getByMonthLimit(offset);
+
+    for (let i = 0; i <= month; i++) {
+      monthsReport.push(yield getByMonthLimit(i));
+    };
+
+    yield this.render('index.jade', {
+      monthsReport: monthsReport,
+      months: allow.filter(el => el !== month)
+    });
   })
   .get('/', function* () {
-    yield this.render('index.jade', {
-      user: 'bat'
-    });
+    this.redirect('/report/2');
   });
 
 
